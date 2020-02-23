@@ -4,10 +4,8 @@ monkey.patch_all()
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 from json import dumps
-import pyaudio
 from audio import AudioWire
-
-
+import sounddevice as sd
 
 
 app = Flask(__name__)
@@ -40,7 +38,10 @@ if __name__ == '__main__':
     HOST = 'localhost'
     PORT = 3000
 
-    audio_wire = AudioWire(socketio)
+    print('Available input devices:')
+    print(sd.query_devices())
+
+    audio_wire = AudioWire(socketio, device=7)
     audio_wire.start()
     print('Started audio wire thread.')
 
