@@ -3,7 +3,6 @@ monkey.patch_all()
 
 from flask import Flask, render_template
 from flask_socketio import SocketIO
-from json import dumps
 from audio import AudioWire
 import sounddevice as sd
 

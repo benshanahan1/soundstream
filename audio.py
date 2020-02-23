@@ -81,7 +81,6 @@ class AudioWire():
     def stop(self):
         """ Stop audio wire streaming. """
         self.is_active = False
-        self.close()
 
     def wait(self):
         self.thread.join()
@@ -108,10 +107,3 @@ class AudioWire():
             while self.is_active:
                 self.socketio.sleep(FRAME_DELAY)
         print('EXIT thread function.')
-
-    def close(self):
-        """ Close stream and clean up. """
-        self.stream.stop_stream()
-        self.stream.close()
-        self.p.terminate()
-        print('terminate')
