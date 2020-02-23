@@ -53,7 +53,7 @@ class AudioWire():
         rv_fft = None
         rv_bass_hit = None
         if status:
-            print(status)
+            print(f'[AUDIO WIRE] {status}')
         if any(indata):
             magnitude = np.abs(np.fft.rfft(indata[:, 0], n=self.fft_size))
             magnitude *= self.gain / self.fft_size
