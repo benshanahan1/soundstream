@@ -6,6 +6,7 @@ setup(
     description='Websocket server for near real-time audio visualization.',
     url='http://github.com/benshanahan1/soundstream',
     packages=find_packages(),
+    include_package_data=True,
     install_requires=[
         'numpy',
         'flask',
