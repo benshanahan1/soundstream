@@ -3,6 +3,10 @@ from json import dumps, JSONEncoder
 from datetime import datetime, date
 
 
+def info(msg):
+    print(f'[SOUNDSTREAM] {msg}')
+
+
 class BetterJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime) or isinstance(obj, date):

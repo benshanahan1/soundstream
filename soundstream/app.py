@@ -1,10 +1,10 @@
 from gevent import monkey
 monkey.patch_all()
 
-from flask import Flask, render_template
-from flask_socketio import SocketIO
-from audio import AudioWire
-import sounddevice as sd
+from flask import Flask, render_template  # noqa: E402
+from flask_socketio import SocketIO  # noqa: E402
+from soundstream.audio import AudioWire  # noqa: E402
+from soundstream.utils import info  # noqa: E402
 
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ socketio = SocketIO(app)
 
 @socketio.on('connect')
 def connect():
-    print('client connected')
+    info('client connected')
 
 
 @socketio.on('start stream')
@@ -24,7 +24,7 @@ def start_stream():
 
 @socketio.on('disconnect')
 def disconnect():
-    print('client disconnected')
+    info('client disconnected')
 
 
 @app.route('/')
@@ -32,13 +32,13 @@ def index():
     return render_template('index.html')
 
 
-if __name__ == '__main__':
+def start_server():
     PROTOCOL = 'http'
     HOST = 'localhost'
     PORT = 3000
 
-    print('Available input devices:')
-    print(sd.query_devices())
+    # info('Available input devices:')
+    # info(sd.query_devices())
 
     audio_wire = AudioWire(socketio)
     audio_wire.start()
@@ -49,3 +49,7 @@ if __name__ == '__main__':
 
     print('Stopping audio wire thread.')
     audio_wire.stop()
+
+
+if __name__ == '__main__':
+    start_server()

@@ -1,7 +1,7 @@
 import sounddevice as sd
 import threading
 import numpy as np
-from misc import better_dumps as dumps
+from soundstream.utils import better_dumps as dumps
 
 
 FRAME_DELAY = 1 / 1000  # frame delay in millis
@@ -98,7 +98,6 @@ class AudioWire():
         })
 
     def thread_function(self):
-        print('ENTER thread function.')
         with sd.InputStream(device=self.device,
                             channels=1,
                             callback=self.callback,
@@ -106,4 +105,3 @@ class AudioWire():
                             samplerate=self.sample_rate):
             while self.is_active:
                 self.socketio.sleep(FRAME_DELAY)
-        print('EXIT thread function.')

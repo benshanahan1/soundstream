@@ -1,5 +1,0 @@
-numpy
-flask
-flask_socketio
-pyaudio
-gevent
