@@ -1,10 +1,25 @@
 <html>
     <head>
+    <style>
+        html, body {
+            height: 100%;
+            background: black;
+            color: white;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
     <script type="text/javascript" charset="utf-8">
         function setup() {
-            createCanvas(400, 800);
+            createCanvas(399, 255);
+            background('black');
+            stroke('white');
 
             const socket = io.connect()
 
@@ -18,23 +33,25 @@
             });
 
             socket.on('data frame', function(rawFrame) {
-                const { success, is_data, data } = JSON.parse(rawFrame);
-
-                if (!is_data) {
+                const { success, is_data, fft, bass_hit } = JSON.parse(rawFrame);
+                if (bass_hit) console.log('boom pow');
+                if (!is_data)
                     console.log('no data');
-                } else {
-                    clear();
-                    strokeWeight(5);
-                    for (let i = 0; i < data.length; i++) {
-                        line(0, 10 + 7 * i, data[i], 10 + 7*i );
-                    }
+                clear();
+                const weight = 3;
+                const spacing = 1;
+                const color = bass_hit ? 'darkred' : 'black';
+                strokeWeight(weight);
+                background(color);
+                for (let i = 0; i < fft.length; i++) {
+                    const x = (weight + spacing) * i;
+                    const y0 = 255;
+                    const y1 = y0 - fft[i];
+                    line(x, y0, x, y1);
                 }
             });
         }
     </script>
 </head>
-<body>
-    <h1>Socket-IO test</h1>
-    <p>Data throughput test.</p>
-</body>
+<body />
 </html>

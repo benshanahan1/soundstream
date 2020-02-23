@@ -41,7 +41,7 @@ if __name__ == '__main__':
     print('Available input devices:')
     print(sd.query_devices())
 
-    audio_wire = AudioWire(socketio, device=7)
+    audio_wire = AudioWire(socketio)
     audio_wire.start()
     print('Started audio wire thread.')
 

@@ -4,22 +4,23 @@ import numpy as np
 from misc import better_dumps as dumps
 
 
-FRAME_DELAY = 20 / 1000  # frame delay in millis
+FRAME_DELAY = 1 / 1000  # frame delay in millis
 
 
 class AudioWire():
-    def __init__(self, socketio, device=0):
+    def __init__(self, socketio, device=None):
         """Wire audio from sound card to output stream.
 
         :param socketio: SocketIO app object.
-        :param int | str: Audio input device (numeric ID or substring).
+        :param int | str: Audio input device (numeric ID or substring). If
+            none, default device is used.
         """
         self.socketio = socketio
         self.thread = None
         self.is_active = False
         self.device = device
-        self.n_fft_bins = 80
-        self.gain = 100  # initial gain factor
+        self.n_fft_bins = 100
+        self.gain = 20  # initial gain factor
         self.block_duration = 50  # block size (ms)
         self.range_low = 100  # range low end (Hz)
         self.range_high = 2000  # range high end (Hz)
@@ -49,15 +50,27 @@ class AudioWire():
         return int(np.clip(val, 0, 1) * self.max_amplitude)
 
     def callback(self, indata, frames, time, status):
-        rv = None
+        rv_fft = None
+        rv_bass_hit = None
         if status:
             print(status)
         if any(indata):
             magnitude = np.abs(np.fft.rfft(indata[:, 0], n=self.fft_size))
             magnitude *= self.gain / self.fft_size
             magnitude_in_range = magnitude[self.low_bin:self.low_bin+self.n_fft_bins]  # noqa: E501
-            rv = [self.map_amplitude(x) for x in magnitude_in_range]
-        self.socketio.emit('data frame', self.pack_data_frame(rv))
+            rv_fft = [self.map_amplitude(x) for x in magnitude_in_range]
+            rv_bass_hit = self.check_bass_hit(rv_fft)
+        data_frame = self.pack_data_frame(rv_fft, rv_bass_hit)
+        self.socketio.emit('data frame', data_frame)
+
+    def check_bass_hit(self, fft):
+        """ Check if music has a "bass hit". """
+        n = 5
+        threshold = 0.65 * self.max_amplitude
+        if fft is None:
+            return False
+        bin_mean = sum(fft[:n]) / n  # sum of lowest n bins
+        return bin_mean > threshold
 
     def start(self):
         """ Start audio wire streaming. """
@@ -73,12 +86,16 @@ class AudioWire():
     def wait(self):
         self.thread.join()
 
-    def pack_data_frame(self, data):
-        is_data = data is not None
+    def list_of_zeros(self, length):
+        return np.zeros(length, dtype=np.int).tolist()
+
+    def pack_data_frame(self, fft, bass_hit):
+        is_data = fft is not None
         return dumps({
             'success': True,
             'is_data': is_data,
-            'data': data if is_data else np.zeros(self.n_fft_bins, dtype=np.int).tolist(),  # noqa: E501
+            'fft': fft if is_data else self.list_of_zeros(self.n_fft_bins),
+            'bass_hit': bass_hit,
         })
 
     def thread_function(self):
