@@ -4,7 +4,7 @@ import numpy as np
 from soundstream.utils import better_dumps as dumps
 
 
-FRAME_DELAY = 1 / 1000  # frame delay in millis
+FRAME_DELAY = 5 / 1000  # frame delay in seconds
 
 
 class AudioWire():
@@ -32,6 +32,9 @@ class AudioWire():
     def check_inputs(self):
         if self.range_high <= self.range_low:
             raise Exception('High must be greater than low in range.')
+
+    def query_devices(self):
+        return sd.query_devices()
 
     def compute_fft_params(self):
         self.sample_rate = sd.query_devices(self.device, 'input')['default_samplerate']  # noqa: E501

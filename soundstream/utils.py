@@ -3,8 +3,12 @@ from json import dumps, JSONEncoder
 from datetime import datetime, date
 
 
-def info(msg):
-    print(f'[SOUNDSTREAM] {msg}')
+def int_or_str(text):
+    """Helper function for argument parsing."""
+    try:
+        return int(text)
+    except ValueError:
+        return text
 
 
 class BetterJSONEncoder(JSONEncoder):
