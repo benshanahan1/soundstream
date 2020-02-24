@@ -6,11 +6,11 @@ from soundstream.utils import better_dumps as dumps
 
 DEFAULT_EMIT_RATE = 1 / 1000  # emit rate to clients in seconds
 DEFAULT_N_FFT_BINS = 100
-DEFAULT_GAIN = 10
+DEFAULT_GAIN = 15
 DEFAULT_BLOCK_DURATION = 25  # block size (ms)
 DEFAULT_FREQ_RANGE_LOW = 100  # low freq limit (Hz)
 DEFAULT_FREQ_RANGE_HIGH = 2000  # high freq limit (Hz)
-DEFAULT_MAX_AMPL = 255  # arbitrary max ampl to map to
+DEFAULT_MAX_AMPL = 200  # arbitrary max ampl to map to
 
 
 class AudioWire():
