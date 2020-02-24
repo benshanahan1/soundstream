@@ -17,7 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
     <script type="text/javascript" charset="utf-8">
         function setup() {
-            createCanvas(399, 255);
+            createCanvas(399, 400);
             background('black');
             stroke('white');
 
@@ -36,8 +36,9 @@
                 background(color);
                 for (let i = 0; i < fft.length; i++) {
                     const x = (weight + spacing) * i;
-                    const y0 = 255;
-                    const y1 = y0 - fft[i];
+                    const y0 = 200 - fft[i];
+                    const y1 = 200 + fft[i];
+                    stroke(255, 255 - fft[i], 255 - fft[i]);
                     line(x, y0, x, y1);
                 }
             });
