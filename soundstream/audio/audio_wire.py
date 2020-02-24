@@ -4,11 +4,26 @@ import numpy as np
 from soundstream.utils import better_dumps as dumps
 
 
-FRAME_DELAY = 5 / 1000  # frame delay in seconds
+DEFAULT_EMIT_RATE = 1 / 1000  # emit rate to clients in seconds
+DEFAULT_N_FFT_BINS = 100
+DEFAULT_GAIN = 10
+DEFAULT_BLOCK_DURATION = 25  # block size (ms)
+DEFAULT_FREQ_RANGE_LOW = 100  # low freq limit (Hz)
+DEFAULT_FREQ_RANGE_HIGH = 2000  # high freq limit (Hz)
+DEFAULT_MAX_AMPL = 255  # arbitrary max ampl to map to
 
 
 class AudioWire():
-    def __init__(self, socketio, device=None):
+    def __init__(self,
+                 socketio,
+                 device=None,
+                 emit_rate=DEFAULT_EMIT_RATE,
+                 n_fft_bins=DEFAULT_N_FFT_BINS,
+                 gain=DEFAULT_GAIN,
+                 block_duration=DEFAULT_BLOCK_DURATION,
+                 freq_range_low=DEFAULT_FREQ_RANGE_LOW,
+                 freq_range_high=DEFAULT_FREQ_RANGE_HIGH,
+                 max_ampl=DEFAULT_MAX_AMPL):
         """Wire audio from sound card to output stream.
 
         :param socketio: SocketIO app object.
@@ -19,18 +34,19 @@ class AudioWire():
         self.thread = None
         self.is_active = False
         self.device = device
-        self.n_fft_bins = 100
-        self.gain = 20  # initial gain factor
-        self.block_duration = 50  # block size (ms)
-        self.range_low = 100  # range low end (Hz)
-        self.range_high = 2000  # range high end (Hz)
-        self.max_amplitude = 255  # arbitrary maximum amplitude
+        self.emit_rate = emit_rate
+        self.n_fft_bins = n_fft_bins
+        self.gain = gain
+        self.block_duration = block_duration
+        self.freq_range_low = freq_range_low
+        self.freq_range_high = freq_range_high
+        self.max_amplitude = max_ampl
 
         self.check_inputs()
         self.compute_fft_params()
 
     def check_inputs(self):
-        if self.range_high <= self.range_low:
+        if self.freq_range_high <= self.freq_range_low:
             raise Exception('High must be greater than low in range.')
 
     def query_devices(self):
@@ -38,9 +54,9 @@ class AudioWire():
 
     def compute_fft_params(self):
         self.sample_rate = sd.query_devices(self.device, 'input')['default_samplerate']  # noqa: E501
-        self.delta_freq = (self.range_high - self.range_low) / (self.n_fft_bins - 1)  # noqa: E501
+        self.delta_freq = (self.freq_range_high - self.freq_range_low) / (self.n_fft_bins - 1)  # noqa: E501
         self.fft_size = int(np.ceil(self.sample_rate / self.delta_freq))
-        self.low_bin = int(np.floor(self.range_low / self.delta_freq))
+        self.low_bin = int(np.floor(self.freq_range_low / self.delta_freq))
         self.block_size = int(self.sample_rate * self.block_duration / 1000)
 
     def map_amplitude(self, val):
@@ -107,4 +123,4 @@ class AudioWire():
                             blocksize=self.block_size,
                             samplerate=self.sample_rate):
             while self.is_active:
-                self.socketio.sleep(FRAME_DELAY)
+                self.socketio.sleep(self.emit_rate)
