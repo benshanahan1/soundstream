@@ -7,9 +7,14 @@ def index():
     return render_template('index.html')
 
 
-@main.route('/tunnel')
-@main.route('/tunnel/<string:mode>')
+@main.route('/viz/spectro')
+def spectro():
+    return render_template('viz/spectro.html')
+
+
+@main.route('/viz/tunnel')
+@main.route('/viz/tunnel/<string:mode>')
 def falling(mode='squares'):
     if mode not in ['squares', 'circles', 'bars']:
         mode = 'squares'
-    return render_template('tunnel.html', mode=mode)
+    return render_template('viz/tunnel.html', mode=mode)

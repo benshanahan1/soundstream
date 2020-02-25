@@ -1,0 +1,93 @@
+<html>
+    <head>
+    <style>
+        html, body {
+            height: 100%;
+            background: black;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        const arrayOfNumber = (numToFill, nElements) => Array(nElements).fill(numToFill);
+
+        // drawing constants
+        const canvasWidth = window.innerWidth * 0.9;
+        const canvasHeight = window.innerHeight * 0.9;
+        const midHeight = canvasHeight / 2;
+        const weight = canvasWidth / 100;
+        const spacing = 2;
+        const backgroundColor = 'black';
+        const strokeColor = 'white';
+
+        // soundstream info
+        const nBins = 100;  // number of FFT bins
+        const maxAmpl = 255;  // maximum scaled FFT amplitude
+        let isData = false;
+        let bassHit = false;
+        let fft = arrayOfNumber(0, nBins);
+        let fftSmooth = arrayOfNumber(0, nBins);
+        let envelopeLower = arrayOfNumber(midHeight, nBins);
+        let envelopeUpper = arrayOfNumber(midHeight, nBins);
+
+        function setup() {
+            createCanvas(canvasWidth, canvasHeight);
+            background(backgroundColor);
+            stroke(strokeColor);
+
+            const socket = io.connect()
+
+            socket.on('data frame', function(rawFrame) {
+                const parsedData = JSON.parse(rawFrame);
+                bassHit = parsedData.bass_hit;
+                isData = parsedData.is_data;
+                fft = isData ? parsedData.fft : arrayOfNumber(0, nBins);
+            });
+        }
+
+        function draw() {
+            background(backgroundColor);  // reset background
+            strokeWeight(weight);
+
+            // if (!isData) return;
+
+            for (let i = 0; i < fft.length; i++) {
+                fftSmooth[i] = (fftSmooth[i] + fft[i]) / 2;  // moving avg for fft to smooth it a bit
+
+                const x = (weight + spacing) * i;
+                const y0 = midHeight - fftSmooth[i];
+                const y1 = midHeight + fftSmooth[i];
+
+                // Update envelopes.
+                if (y0 < envelopeLower[i]) {
+                    envelopeLower[i] = y0;
+                } else if (envelopeLower[i] < midHeight) {
+                    envelopeLower[i] += 2;
+                }
+                if (y1 > envelopeUpper[i]) {
+                    envelopeUpper[i] = y1;
+                } else if (envelopeUpper[i] > midHeight) {
+                    envelopeUpper[i] -= 2;
+                }
+
+                stroke('#310642');
+                line(x, envelopeLower[i], x, envelopeUpper[i]);
+                stroke(255, 255 - fftSmooth[i], 255 - fftSmooth[i]);
+                line(x, y0, x, y1);
+            }
+        }
+
+        function handleWindowResize() {
+            window.location.reload();
+        }
+
+        window.addEventListener('resize', handleWindowResize);
+    </script>
+</head>
+</html>
