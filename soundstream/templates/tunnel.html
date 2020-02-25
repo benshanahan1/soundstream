@@ -2,7 +2,7 @@
     <head>
     <style>
         html, body {
-            height: 100%;
+            height: 100vh;
             background: black;
         }
         body {
@@ -17,12 +17,14 @@
     <script type="text/javascript" charset="utf-8">
         const arrayOfNumber = (numToFill, nElements) => Array(nElements).fill(numToFill);
 
+        // set display mode from template
+        const DISPLAY_MODE = '{{ mode }}';
+
         // drawing constants
-        const canvasWidth = window.innerWidth * 0.9;
-        const canvasHeight = window.innerHeight * 0.9;
+        const canvasWidth = window.innerWidth;
+        const canvasHeight = window.innerHeight;
         const midHeight = canvasHeight / 2;
-        const weight = canvasWidth / 100;
-        const spacing = 2;
+        const barWidth = canvasWidth / 100;
         const backgroundColor = 'black';
         const strokeColor = 'white';
 
@@ -33,8 +35,6 @@
         let bassHit = false;
         let fft = arrayOfNumber(0, nBins);
         let fftSmooth = arrayOfNumber(0, nBins);
-        let envelopeLower = arrayOfNumber(midHeight, nBins);
-        let envelopeUpper = arrayOfNumber(midHeight, nBins);
 
         function setup() {
             createCanvas(canvasWidth, canvasHeight);
@@ -52,34 +52,28 @@
         }
 
         function draw() {
+            noStroke();
             background(backgroundColor);  // reset background
-            strokeWeight(weight);
 
-            // if (!isData) return;
-
-            for (let i = 0; i < fft.length; i++) {
+            for (let i = fft.length; i > 0; i--) {
                 fftSmooth[i] = (fftSmooth[i] + fft[i]) / 2;  // moving avg for fft to smooth it a bit
 
-                const x = (weight + spacing) * i;
-                const y0 = midHeight - fftSmooth[i];
-                const y1 = midHeight + fftSmooth[i];
+                const currentWidth = barWidth * i;
+                const x = canvasWidth / 2 - currentWidth / 2;
+                const y = canvasHeight / 2 - currentWidth / 2;
 
-                // Update envelopes.
-                if (y0 < envelopeLower[i]) {
-                    envelopeLower[i] = y0;
-                } else if (envelopeLower[i] < midHeight) {
-                    envelopeLower[i] += 2;
+                fill(fftSmooth[i], fftSmooth[i], fftSmooth[i]);
+                switch(DISPLAY_MODE) {
+                    case 'circles':
+                        circle(canvasWidth / 2, canvasHeight / 2, currentWidth);
+                        break;
+                    case 'bars':
+                        rect(currentWidth, 0, barWidth, canvasHeight);
+                        break;
+                    default:
+                        rect(x, y, currentWidth, currentWidth);
+                        break;
                 }
-                if (y1 > envelopeUpper[i]) {
-                    envelopeUpper[i] = y1;
-                } else if (envelopeUpper[i] > midHeight) {
-                    envelopeUpper[i] -= 2;
-                }
-
-                stroke('#310642');
-                line(x, envelopeLower[i], x, envelopeUpper[i]);
-                stroke(255, 255 - fftSmooth[i], 255 - fftSmooth[i]);
-                line(x, y0, x, y1);
             }
         }
     </script>
