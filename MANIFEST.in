@@ -1,1 +1,1 @@
-include soundstream/templates/*
+include soundstream/web/*

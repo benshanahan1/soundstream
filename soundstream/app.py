@@ -11,7 +11,10 @@ socketio = SocketIO()
 
 def create_app():
     """ Create Flask app. """
-    app = Flask(__name__)
+    app = Flask(__name__,
+                static_url_path='/static',
+                static_folder='web/static',
+                template_folder='web/templates')
     from soundstream.routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
     socketio.init_app(app)
