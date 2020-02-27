@@ -15,4 +15,8 @@ viz_index = {
         'display_name': 'Tunnel',
         'description': 'Concentric circles.',
     },
+    'p5spectrum': {
+        'display_name': 'p5.js Spectrum',
+        'description': 'FFT in the browser using p5.js library.',
+    },
 }
