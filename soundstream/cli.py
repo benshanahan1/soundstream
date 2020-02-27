@@ -20,4 +20,8 @@ def parse_args():
                         action='store_true',
                         default=False,
                         help='show verbose debug output')
+    parser.add_argument('-b', '--launch-browser',
+                        action='store_true',
+                        default=False,
+                        help='launch browser on server start')
     return parser.parse_args()

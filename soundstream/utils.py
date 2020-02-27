@@ -1,11 +1,6 @@
-import os
 import numpy as np
 from json import dumps, JSONEncoder
 from datetime import datetime, date
-
-
-def get_list_of_visualizations(app):
-    return os.listdir(os.getcwd() + '/soundstream/web/static/viz')
 
 
 def int_or_str(text):

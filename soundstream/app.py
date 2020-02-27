@@ -1,3 +1,4 @@
+from webbrowser import open_new
 from flask import Flask
 from flask_socketio import SocketIO
 from sounddevice import query_devices
@@ -37,8 +38,11 @@ def run_server(app):
     audio_wire.start()
 
     # Start Flask server.
-    print(f'Server started on http://{args.host}:{args.port}/')
+    url = f'http://{args.host}:{args.port}/'
+    print(f'Server started on {url}')
     try:
+        if args.launch_browser:
+            open_new(url)
         socketio.run(app, host=args.host, port=args.port, use_reloader=False)
     except KeyboardInterrupt:
         audio_wire.stop()

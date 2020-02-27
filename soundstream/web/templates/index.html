@@ -13,9 +13,9 @@
     <h1>Choose an audio visualization</h1>
     <p>Press <b>F11</b> with a visualization window open to toggle fullscreen.</p>
     <ul>
-        {% for name in viz_list %}
+        {% for name, details in viz_index.items() %}
             <li>
-                <a href="#" onclick="popupWindow('/viz/{{ name }}');">{{ name }}</a>
+                <a href="#" onclick="popupWindow('/viz/{{ name }}');">{{ details['display_name'] }}</a>: {{ details['description'] }}
             </li>
         {% endfor %}
     </ul>

@@ -1,12 +1,11 @@
-from flask import render_template, current_app
+from flask import render_template
 from soundstream.routes import main
-from soundstream.utils import get_list_of_visualizations
+from soundstream.viz_index import index as viz_index
 
 
 @main.route('/')
 def index():
-    viz_list = get_list_of_visualizations(current_app)
-    return render_template('index.html', viz_list=viz_list)
+    return render_template('index.html', viz_index=viz_index)
 
 
 @main.route('/viz/<string:name>')
