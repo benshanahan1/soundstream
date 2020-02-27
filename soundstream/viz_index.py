@@ -1,4 +1,4 @@
-index = {
+viz_index = {
     'audiotest': {
         'display_name': 'Chrome Mic Test',
         'description': 'Testing out the mic input directly to the browser',

@@ -1,6 +1,6 @@
 from flask import render_template
 from soundstream.routes import main
-from soundstream.viz_index import index as viz_index
+from soundstream.viz_index import viz_index
 
 
 @main.route('/')
