@@ -1,6 +1,8 @@
 # soundstream
 Websocket server proof-of-concept for providing near real-time audio visualization in a browser (or other client). A demo is available at http://localhost:3000/ (once the server is configured and running).
 
+![Spectro Animation](gifs/spectro-anim.gif)
+
 ## Install
 ### General Usage
 Install the soundstream server directly from GitHub:
