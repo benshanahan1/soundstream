@@ -4,13 +4,13 @@ const canvasWidth = window.innerWidth * 0.9;
 const canvasHeight = window.innerHeight * 0.9;
 
 const nHistory = 100;
-const nBinsShown = 40;
+const nBinsShown = 100;
 let fftSmooth = arrayOfNumber(0, nBinsShown);
 let fftHistory = arrayOfNumber(fftSmooth.slice(0), nHistory);
 const gain = 1.15;
 
 // drawing constants
-const spacing = 4;
+const spacing = 0;
 const boxWidth = canvasWidth / nHistory;
 const boxHeight = canvasHeight / nBinsShown;
 const defaultBackgroundColor = "black";
@@ -19,7 +19,8 @@ function setup() {
   createCanvas(canvasWidth, canvasHeight);
   background(defaultBackgroundColor);
   noStroke();
-  frameRate(24);
+  frameRate(30);
+  colorMode(HSB);
 }
 
 function draw() {
@@ -28,17 +29,22 @@ function draw() {
   }
 
   // fftHistory will act as a FIFO queue. Remove first element using slice().
-  fftHistory = fftHistory.slice(1); // throw away first element
-  fftHistory.push(fftSmooth.slice(0));
+  fftHistory.pop(); // throw away last element
+  fftHistory.unshift(fftSmooth.slice(0));  // add current value to beginning
 
   for (let i = 0; i < nHistory; i++) {
     const row = fftHistory[i];
     for (let j = 0; j < nBinsShown; j++) {
       noStroke();
-      fill(row[j] * gain, row[j] * gain, row[j] * gain);
+      fill(
+        map(gain * row[j], 0, 200, 255, 0),
+        // map(row[j], 0, 200, 255, 0),
+        255,
+        map(gain * row[j], 0, 200, 0, 255),
+      );
       rect(
         i * boxWidth,
-        j * boxHeight,
+        canvasHeight - (j * boxHeight),
         boxWidth - spacing,
         boxHeight - spacing
       );
